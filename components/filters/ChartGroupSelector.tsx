@@ -2,12 +2,14 @@
 
 import { useDashboardStore } from '@/lib/store'
 import { CHART_GROUPS, type ChartGroupId } from '@/lib/chart-groups'
-import { BarChart3, Target, type LucideIcon } from 'lucide-react'
+import { BarChart3, Car, Target, Users, type LucideIcon } from 'lucide-react'
 
 // Icon mapping for each chart group
 const iconMap: Record<ChartGroupId, LucideIcon> = {
   'market-analysis': BarChart3,
   'coherent-opportunity': Target,
+  'customer-propositions': Users,
+  'transponder-mapping': Car,
 }
 
 export function ChartGroupSelector() {
@@ -45,6 +47,10 @@ export function ChartGroupSelector() {
               <span className="text-xs font-medium leading-tight">
                 {group.label === 'Coherent Opportunity Matrix' 
                   ? <span>Coherent Opportunity<br/>Matrix</span>
+                  : group.label === 'Customer Intelligence'
+                  ? <span>Customer<br/>Intelligence</span>
+                  : group.id === 'transponder-mapping'
+                  ? <span>BRAND-LEVEL<br/>AUTOMOTIVE<br/>TRANSPONDER MAPPING TABLE</span>
                   : group.label}
               </span>
             </button>

@@ -3,7 +3,11 @@
  * Defines the grouping of charts for different analytical perspectives
  */
 
-export type ChartGroupId = 'market-analysis' | 'coherent-opportunity'
+export type ChartGroupId =
+  | 'market-analysis'
+  | 'coherent-opportunity'
+  | 'customer-propositions'
+  | 'transponder-mapping'
 
 export interface ChartGroup {
   id: ChartGroupId
@@ -27,6 +31,20 @@ export const CHART_GROUPS: ChartGroup[] = [
     description: 'Opportunity identification and analysis',
     charts: ['bubble'],
     icon: '🎯'
+  },
+  {
+    id: 'customer-propositions',
+    label: 'Customer Intelligence',
+    description: 'Customer database — Proposition 1, 2 & 3 (framework from sample file)',
+    charts: ['ci-proposition-tables'],
+    icon: '👤'
+  },
+  {
+    id: 'transponder-mapping',
+    label: 'Brand-level transponder mapping',
+    description: 'BRAND-LEVEL AUTOMOTIVE TRANSPONDER MAPPING TABLE — makes, models, keys, and transponder detail',
+    charts: ['transponder-brand-table'],
+    icon: '🔑'
   }
 ]
 

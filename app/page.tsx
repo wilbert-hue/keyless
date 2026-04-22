@@ -15,6 +15,8 @@ import { CompetitiveIntelligence } from '@/components/charts/CompetitiveIntellig
 import CustomerIntelligenceHeatmap from '@/components/charts/CustomerIntelligenceHeatmap'
 import DistributorsIntelligence from '@/components/charts/DistributorsIntelligenceTable'
 import CustomerIntelligenceDatabase from '@/components/charts/CustomerIntelligenceDatabase'
+import { CustomerPropositionsTables } from '@/components/charts/CustomerPropositionsTables'
+import { TransponderBrandMappingTable } from '@/components/charts/TransponderBrandMappingTable'
 import { InsightsPanel } from '@/components/InsightsPanel'
 import { FilterPresets } from '@/components/filters/FilterPresets'
 import { ChartGroupSelector } from '@/components/filters/ChartGroupSelector'
@@ -31,7 +33,19 @@ export default function DashboardPage() {
   const { setData, setLoading, setError, data, isLoading, error, filters, selectedChartGroup, dashboardName } = useDashboardStore()
   const [mounted, setMounted] = useState(false)
   const [hasCheckedStore, setHasCheckedStore] = useState(false)
-  const [activeTab, setActiveTab] = useState<'bar' | 'line' | 'heatmap' | 'table' | 'waterfall' | 'bubble' | 'competitive-intelligence' | 'customer-intelligence' | 'customer-intelligence-database'>('bar')
+  const [activeTab, setActiveTab] = useState<
+    | 'bar'
+    | 'line'
+    | 'heatmap'
+    | 'table'
+    | 'waterfall'
+    | 'bubble'
+    | 'competitive-intelligence'
+    | 'customer-intelligence'
+    | 'customer-intelligence-database'
+    | 'ci-propositions'
+    | 'transponder-mapping'
+  >('bar')
   const [showInsights, setShowInsights] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [viewMode, setViewMode] = useState<'tabs' | 'vertical'>('tabs')
@@ -55,7 +69,9 @@ export default function DashboardPage() {
     'bubble': 'bubble',
     'competitive-intelligence': 'competitive-intelligence',
     'customer-intelligence': 'customer-intelligence',
-    'customer-intelligence-database': 'customer-intelligence-database'
+    'customer-intelligence-database': 'customer-intelligence-database',
+    'ci-proposition-tables': 'ci-propositions',
+    'transponder-brand-table': 'transponder-mapping',
   }
 
   // Auto-switch to first available tab when chart group changes
@@ -404,6 +420,32 @@ export default function DashboardPage() {
                             👤 Customer Intelligence
                           </button>
                         )}
+                        {isChartVisible('ci-proposition-tables') && (
+                          <button
+                            onClick={() => setActiveTab('ci-propositions')}
+                            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                              activeTab === 'ci-propositions'
+                                ? 'border-blue-500 text-blue-600'
+                                : 'border-transparent text-black hover:text-black hover:border-gray-300'
+                            }`}
+                          >
+                            📋 Proposition 1–3 Tables
+                          </button>
+                        )}
+                        {isChartVisible('transponder-brand-table') && (
+                          <button
+                            onClick={() => setActiveTab('transponder-mapping')}
+                            className={`px-3 py-3 text-sm font-medium border-b-2 text-center leading-tight transition-colors sm:px-6 ${
+                              activeTab === 'transponder-mapping'
+                                ? 'border-blue-500 text-blue-600'
+                                : 'border-transparent text-black hover:text-black hover:border-gray-300'
+                            }`}
+                            title="BRAND-LEVEL AUTOMOTIVE TRANSPONDER MAPPING TABLE"
+                          >
+                            <span className="block sm:inline">BRAND-LEVEL AUTOMOTIVE</span>
+                            <span className="block sm:ml-1 sm:inline">TRANSPONDER MAPPING TABLE</span>
+                          </button>
+                        )}
                       </>
                     )}
                   </nav>
@@ -519,6 +561,18 @@ export default function DashboardPage() {
                         />
                       </div>
                     )}
+
+                    {activeTab === 'ci-propositions' && (
+                      <div id="ci-proposition-tables" className="min-h-[400px]">
+                        <CustomerPropositionsTables />
+                      </div>
+                    )}
+
+                    {activeTab === 'transponder-mapping' && (
+                      <div id="transponder-brand-table" className="min-h-[400px]">
+                        <TransponderBrandMappingTable />
+                      </div>
+                    )}
                   </>
                 ) : (
                   <div className="space-y-8">
@@ -616,6 +670,19 @@ export default function DashboardPage() {
                           title="Customer Intelligence Database"
                           height={600}
                         />
+                      </div>
+                    )}
+
+                    {isChartVisible('ci-proposition-tables') && (
+                      <div className="border-b pb-8">
+                        <h3 className="text-lg font-semibold text-black mb-4">📋 Customer intelligence — Propositions 1, 2 & 3</h3>
+                        <CustomerPropositionsTables />
+                      </div>
+                    )}
+
+                    {isChartVisible('transponder-brand-table') && (
+                      <div className="border-b pb-8" id="transponder-brand-table-vertical">
+                        <TransponderBrandMappingTable />
                       </div>
                     )}
                   </div>
