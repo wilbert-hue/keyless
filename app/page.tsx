@@ -220,7 +220,7 @@ export default function DashboardPage() {
                 Coherent Dashboard
               </h1>
               <h2 className="text-sm text-black">
-                {dashboardName || 'Global Automotive Keyless Entry Systems Market'}
+                {dashboardName || 'Global Automotive Keyless Entry, Immobilizer, and Transponder Market'}
               </h2>
             </div>
           </div>

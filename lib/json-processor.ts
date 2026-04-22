@@ -1472,7 +1472,7 @@ export async function processJsonDataAsync(
     
     // Build metadata
     const metadata: Metadata = {
-      market_name: 'Automotive Keyless Entry Systems Market',
+      market_name: 'Automotive Keyless Entry, Immobilizer, and Transponder Market',
       market_type: 'Market Analysis',
       industry: 'Automotive & Mobility',
       years: allYears,
