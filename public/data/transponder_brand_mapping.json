@@ -1,6 +1,6 @@
 {
-  "title": "BRAND-LEVEL AUTOMOTIVE TRANSPONDER MAPPING TABLE",
-  "subtitle": "Reference rows consolidated from provided framework samples (Toyota, Honda, Ford, Volkswagen, BMW, Hyundai).",
+  "title": "Make-Model-Year-Tech Mapping Table",
+  "subtitle": "Makes, models, keys, and transponder technology detail — sample reference rows (Toyota, Honda, Ford, Volkswagen, BMW, Hyundai).",
   "columns": [
     "Make",
     "Model",

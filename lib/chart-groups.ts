@@ -41,8 +41,8 @@ export const CHART_GROUPS: ChartGroup[] = [
   },
   {
     id: 'transponder-mapping',
-    label: 'Brand-level transponder mapping',
-    description: 'BRAND-LEVEL AUTOMOTIVE TRANSPONDER MAPPING TABLE — makes, models, keys, and transponder detail',
+    label: 'Make-Model-Year-Tech mapping',
+    description: 'Make-Model-Year-Tech Mapping Table — makes, models, keys, and transponder detail',
     charts: ['transponder-brand-table'],
     icon: '🔑'
   }

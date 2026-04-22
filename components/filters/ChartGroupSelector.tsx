@@ -50,7 +50,7 @@ export function ChartGroupSelector() {
                   : group.label === 'Customer Intelligence'
                   ? <span>Customer<br/>Intelligence</span>
                   : group.id === 'transponder-mapping'
-                  ? <span>BRAND-LEVEL<br/>AUTOMOTIVE<br/>TRANSPONDER MAPPING TABLE</span>
+                  ? <span>Make-Model-<br/>Year-Tech<br/>Mapping Table</span>
                   : group.label}
               </span>
             </button>

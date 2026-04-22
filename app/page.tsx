@@ -440,10 +440,10 @@ export default function DashboardPage() {
                                 ? 'border-blue-500 text-blue-600'
                                 : 'border-transparent text-black hover:text-black hover:border-gray-300'
                             }`}
-                            title="BRAND-LEVEL AUTOMOTIVE TRANSPONDER MAPPING TABLE"
+                            title="Make-Model-Year-Tech Mapping Table"
                           >
-                            <span className="block sm:inline">BRAND-LEVEL AUTOMOTIVE</span>
-                            <span className="block sm:ml-1 sm:inline">TRANSPONDER MAPPING TABLE</span>
+                            <span className="block sm:inline">Make-Model-Year-Tech</span>
+                            <span className="block sm:ml-1 sm:inline">Mapping Table</span>
                           </button>
                         )}
                       </>

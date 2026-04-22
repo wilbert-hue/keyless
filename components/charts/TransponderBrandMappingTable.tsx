@@ -30,7 +30,7 @@ export function TransponderBrandMappingTable() {
     let c = true
     fetch('/data/transponder_brand_mapping.json')
       .then((r) => {
-        if (!r.ok) throw new Error(`Failed to load transponder mapping (${r.status})`)
+        if (!r.ok) throw new Error(`Failed to load make-model-year-tech table (${r.status})`)
         return r.json()
       })
       .then((d: Payload) => {
@@ -53,7 +53,7 @@ export function TransponderBrandMappingTable() {
   if (!data) {
     return (
       <div className="flex h-64 items-center justify-center text-sm text-slate-500">
-        Loading transponder mapping table…
+        Loading make-model-year-tech mapping table…
       </div>
     )
   }
