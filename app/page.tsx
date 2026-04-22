@@ -204,7 +204,7 @@ export default function DashboardPage() {
                 Coherent Dashboard
               </h1>
               <h2 className="text-sm text-black">
-                {dashboardName || 'Global Normothermic Machine Perfusion Market'}
+                {dashboardName || 'Global Automotive Keyless Entry Systems Market'}
               </h2>
             </div>
           </div>
@@ -212,10 +212,16 @@ export default function DashboardPage() {
         </div>
 
         {/* Global KPI Cards */}
-        <div className="mb-6">
+        <div className="mb-2">
           <GlobalKPICards />
         </div>
-
+        <p
+          className="text-center text-xs sm:text-sm text-gray-500 mb-6 max-w-4xl mx-auto border-t border-gray-200 pt-3"
+          role="note"
+        >
+          <span className="font-semibold text-gray-600">NOTE:</span> All the data in the dashboard is demo data. NO
+          real-world data is related to this.
+        </p>
 
         <div className="grid grid-cols-12 gap-6">
           {/* Sidebar - Enhanced Filter Panel */}

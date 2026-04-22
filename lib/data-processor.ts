@@ -229,6 +229,16 @@ export function filterData(
     }
   }
 
+  // Parent rows (is_aggregated) for a segment name, per geography+type — used to avoid double
+  // counting parent+children. Many datasets have only leaf rows; in that case selecting a
+  // parent (e.g. Commercial Vehicles) must still include LCV/HCV children.
+  const aggregatedParentKeys = new Set<string>()
+  for (const r of data) {
+    if (r.is_aggregated && r.segment && r.segment !== '__ALL_SEGMENTS__') {
+      aggregatedParentKeys.add(`${r.geography}::${r.segment_type}::${r.segment}`)
+    }
+  }
+
   const filtered = data.filter((record) => {
     // 1. Geography filter - enhanced to handle parent-child relationships
     // In geography mode, when a parent geography is selected (e.g., "North America"),
@@ -405,10 +415,15 @@ export function filterData(
             )
 
             if (parentIsSelected && !isExplicitlySelectedSegment) {
-              // Parent aggregated record is already included - exclude this leaf child
-              // BUT if this leaf IS the explicitly selected segment (flat segment with no children),
-              // include it because there's no separate aggregated parent record for flat segments
-              return false
+              const p1 = (hierarchy.level_1 || '').trim()
+              if (p1) {
+                const parentRowKey = `${record.geography}::${record.segment_type}::${p1}`
+                if (aggregatedParentKeys.has(parentRowKey)) {
+                  // A dedicated aggregated row exists for this parent — drop leaves to avoid double count
+                  return false
+                }
+              }
+              // No aggregated parent in the matrix — keep children so the chart shows data
             }
 
             // For other cases, check if this leaf belongs to any selected segment

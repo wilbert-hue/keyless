@@ -13,31 +13,36 @@ const regions = {
   "Middle East & Africa": ["GCC", "South Africa", "Rest of Middle East & Africa"]
 };
 
-// New segment definitions with market share splits (proportions within each segment type)
+// Segment type keys and leaves (align with public/data value.json)
 const segmentTypes = {
-  "By Type": {
-    "Sub-Normothermic Perfusion (20–34°C)": 0.55,
-    "Warm or Normothermic Perfusion (35–37°C)": 0.45
+  "By System Type": {
+    "Immobilizer System": 0.24,
+    "Remote Keyless Entry System": 0.36,
+    "Passive Keyless Entry and Start System": 0.40
   },
-  "By Organ Type": {
-    "Liver": 0.35,
-    "Heart": 0.22,
-    "Lung": 0.18,
-    "Kidney": 0.15,
-    "Others (Pancreas, Small bowel / Intestine, Composite Tissues / Limb Perfusion (emerging use cases))": 0.10
+  "By Key Form Factor": {
+    "Conventional Transponder Key": 0.22,
+    "Remote Head Key": 0.20,
+    "Flip Key": 0.2,
+    "Smart Key": 0.2,
+    "Card Key": 0.18
   },
-  "Application / Use Case": {
-    "Organ Preservation": 0.30,
-    "Viability Assessment": 0.25,
-    "Physiologic Transport": 0.20,
-    "Reconditioning Marginal Organs": 0.15,
-    "Others (Research Use / Protocol development)": 0.10
+  "By Propulsion Type": {
+    "Internal Combustion Engine Vehicles": 0.34,
+    "Hybrid Vehicles": 0.33,
+    "Battery Electric Vehicles": 0.33
   },
-  "By End User": {
-    "Hospitals & Clinics": 0.40,
-    "Specialty Clinic/Centers": 0.25,
-    "Transplant Centers": 0.25,
-    "Others (Research Institutes/Centers, Organ Procurement Organizations, etc.)": 0.10
+  "By Sales Channel": {
+    "OEM Factory-Fit": 0.55,
+    "Aftermarket Replacement Channel": 0.45
+  },
+  "By Vehicle Type": {
+    "Passenger Cars": 0.4,
+    "Two-Wheelers": 0.15,
+    "Commercial Vehicles": {
+      "Light Commercial Vehicles": 0.22,
+      "Heavy Commercial Vehicles": 0.23
+    }
   }
 };
 
@@ -69,31 +74,35 @@ const regionGrowthRates = {
   "Middle East & Africa": 0.118
 };
 
-// Segment-specific growth multipliers (relative to regional base CAGR)
 const segmentGrowthMultipliers = {
-  "By Type": {
-    "Sub-Normothermic Perfusion (20–34°C)": 0.95,
-    "Warm or Normothermic Perfusion (35–37°C)": 1.07
+  "By System Type": {
+    "Immobilizer System": 0.98,
+    "Remote Keyless Entry System": 1.0,
+    "Passive Keyless Entry and Start System": 1.12
   },
-  "By Organ Type": {
-    "Liver": 1.08,
-    "Heart": 1.05,
-    "Lung": 1.12,
-    "Kidney": 0.95,
-    "Others (Pancreas, Small bowel / Intestine, Composite Tissues / Limb Perfusion (emerging use cases))": 1.20
+  "By Key Form Factor": {
+    "Conventional Transponder Key": 0.97,
+    "Remote Head Key": 1.0,
+    "Flip Key": 1.01,
+    "Smart Key": 1.1,
+    "Card Key": 1.15
   },
-  "Application / Use Case": {
-    "Organ Preservation": 0.92,
-    "Viability Assessment": 1.15,
-    "Physiologic Transport": 1.05,
-    "Reconditioning Marginal Organs": 1.18,
-    "Others (Research Use / Protocol development)": 1.10
+  "By Propulsion Type": {
+    "Internal Combustion Engine Vehicles": 0.95,
+    "Hybrid Vehicles": 1.1,
+    "Battery Electric Vehicles": 1.2
   },
-  "By End User": {
-    "Hospitals & Clinics": 0.98,
-    "Specialty Clinic/Centers": 1.10,
-    "Transplant Centers": 1.08,
-    "Others (Research Institutes/Centers, Organ Procurement Organizations, etc.)": 1.05
+  "By Sales Channel": {
+    "OEM Factory-Fit": 0.99,
+    "Aftermarket Replacement Channel": 1.05
+  },
+  "By Vehicle Type": {
+    "Passenger Cars": 0.99,
+    "Two-Wheelers": 1.12,
+    "Commercial Vehicles": {
+      "Light Commercial Vehicles": 1.05,
+      "Heavy Commercial Vehicles": 1.0
+    }
   }
 };
 
@@ -129,6 +138,55 @@ function generateTimeSeries(baseValue, growthRate, roundFn) {
   return series;
 }
 
+function isNumberRecord(obj) {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false;
+  return Object.values(obj).every((v) => typeof v === 'number');
+}
+
+/**
+ * Build a segment block from share + multiplier trees (nested segment groups, e.g. By Propulsion Type).
+ */
+function buildSegBlock(shareTree, multTree, baseValue, baseGrowth, roundFn) {
+  const out = {};
+  for (const [name, def] of Object.entries(shareTree)) {
+    const m = multTree[name];
+    if (typeof def === 'number' && typeof m === 'number') {
+      const g = baseGrowth * m;
+      const b = baseValue * def;
+      out[name] = generateTimeSeries(b, g, roundFn);
+    } else if (isNumberRecord(def) && m && typeof m === 'object' && isNumberRecord(m)) {
+      out[name] = {};
+      for (const [leaf, sh] of Object.entries(def)) {
+        const g2 = baseGrowth * m[leaf];
+        const b2 = baseValue * sh;
+        out[name][leaf] = generateTimeSeries(b2, g2, roundFn);
+      }
+    } else if (def && typeof def === 'object' && m && typeof m === 'object') {
+      out[name] = buildSegBlock(def, m, baseValue, baseGrowth, roundFn);
+    }
+  }
+  return out;
+}
+
+function hasYearKey(obj) {
+  return obj && typeof obj === 'object' && '2021' in obj;
+}
+
+function scaleBlockValues(block, factor, roundFn) {
+  if (hasYearKey(block)) {
+    const s = {};
+    for (const [k, v] of Object.entries(block)) {
+      s[k] = roundFn(v * factor);
+    }
+    return s;
+  }
+  const o = {};
+  for (const [k, v] of Object.entries(block)) {
+    o[k] = scaleBlockValues(v, factor, roundFn);
+  }
+  return o;
+}
+
 function generateData(isVolume) {
   const data = {};
   const roundFn = isVolume ? roundToInt : roundTo1;
@@ -142,12 +200,13 @@ function generateData(isVolume) {
     // Region-level data
     data[regionName] = {};
     for (const [segType, segments] of Object.entries(segmentTypes)) {
-      data[regionName][segType] = {};
-      for (const [segName, share] of Object.entries(segments)) {
-        const segGrowth = regionGrowth * segmentGrowthMultipliers[segType][segName];
-        const segBase = regionBase * share;
-        data[regionName][segType][segName] = generateTimeSeries(segBase, segGrowth, roundFn);
-      }
+      data[regionName][segType] = buildSegBlock(
+        segments,
+        segmentGrowthMultipliers[segType],
+        regionBase,
+        regionGrowth,
+        roundFn
+      );
     }
 
     // Add "By Country" for each region
@@ -170,14 +229,15 @@ function generateData(isVolume) {
 
       data[country] = {};
       for (const [segType, segments] of Object.entries(segmentTypes)) {
-        data[country][segType] = {};
-        for (const [segName, share] of Object.entries(segments)) {
-          const segGrowth = countryGrowth * segmentGrowthMultipliers[segType][segName];
-          const segBase = countryBase * share;
-          // Add slight country-specific variation to segment share
-          const shareVariation = 1 + (seededRandom() - 0.5) * 0.1;
-          data[country][segType][segName] = generateTimeSeries(segBase * shareVariation, segGrowth, roundFn);
-        }
+        const baseBlock = buildSegBlock(
+          segments,
+          segmentGrowthMultipliers[segType],
+          countryBase,
+          countryGrowth,
+          roundFn
+        );
+        const shareVariation = 1 + (seededRandom() - 0.5) * 0.1;
+        data[country][segType] = scaleBlockValues(baseBlock, shareVariation, roundFn);
       }
     }
   }
@@ -200,4 +260,4 @@ console.log('Generated value.json and volume.json successfully');
 console.log('Value geographies:', Object.keys(valueData).length);
 console.log('Volume geographies:', Object.keys(volumeData).length);
 console.log('Segment types:', Object.keys(valueData['North America']));
-console.log('Sample - North America, By Type:', JSON.stringify(valueData['North America']['By Type'], null, 2));
+console.log('Sample - North America, By System Type:', JSON.stringify(valueData['North America']['By System Type'], null, 2));
